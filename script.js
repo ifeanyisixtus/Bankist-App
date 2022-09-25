@@ -58,10 +58,9 @@ const inputLoanAmount = document.querySelector('.form__input--loan-amount');
 const inputCloseUsername = document.querySelector('.form__input--user');
 const inputClosePin = document.querySelector('.form__input--pin');
 //////////////////////////////////////////////////////////////////////
-//// functions ////
+
 const displayMovements = function (movements) {
   containerMovements.innerHTML = '';
-
   movements.forEach(function (mov, i) {
     const type = mov > 0 ? 'deposit' : 'withdrawal';
 
@@ -70,20 +69,37 @@ const displayMovements = function (movements) {
         <div class="movements__type movements__type--${type}">${
       i + 1
     } ${type}</div>
-        <div class="movements__value">${mov}</div>
+        <div class="movements__value">${mov}€</div>
       </div>
     `;
 
     containerMovements.insertAdjacentHTML('afterbegin', html);
   });
 };
-displayMovements(account1.movements);
 
-const calcDisplayBalance = function (movements) {
-  const balance = movements.reduce((acc, mov) => acc + mov, 0);
-  labelBalance.textContent = `${balance} `;
+const calcDisplayBalance = function (accs) {
+  accs.balance = accs.movements.reduce((acc, mov) => acc + mov, 0);
+  labelBalance.textContent = `${accs.balance}€`;
 };
-calcDisplayBalance(account1.movements);
+
+const calcDisplaySummary = function (accs) {
+  const income = accs.movements
+    .filter(mov => mov > 0)
+    .reduce((acc, mov) => acc + mov, 0);
+  labelSumIn.textContent = `${income}€`;
+
+  const outcome = accs.movements
+    .filter(mov => mov < 0)
+    .reduce((acc, mov) => acc + mov, 0);
+  labelSumOut.textContent = `${Math.abs(outcome)}€`;
+
+  const interest = accs.movements
+    .filter(mov => mov > 0)
+    .map(deposit => (deposit * accs.interestRate) / 100)
+    .filter((int, i, arr) => int >= 1)
+    .reduce((acc, int) => acc + int, 0);
+  labelSumInterest.textContent = `${interest}€`;
+};
 
 const createUsernames = function (accs) {
   accs.forEach(function (acc) {
@@ -96,41 +112,36 @@ const createUsernames = function (accs) {
 };
 createUsernames(accounts);
 
-const calcDisplaySummary = function (movements) {
-  const income = movements
-    .filter(mov => mov > 0)
-    .reduce((acc, mov) => acc + mov, 0);
-  labelSumIn.textContent = `${income}€`;
-
-  const outcome = movements
-    .filter(mov => mov < 0)
-    .reduce((acc, mov) => acc + mov, 0);
-  labelSumOut.textContent = `${Math.abs(outcome)}€`;
-
-  const interest = movements
-    .filter(mov => mov > 0)
-    .map(deposit => (deposit * 1.2) / 100)
-    .filter((int, i, arr) => int >= 1)
-    .reduce((acc, int) => acc + int, 0);
-  labelSumInterest.textContent = `${interest}€`;
-};
-calcDisplaySummary(account1.movements);
 ////////////////////////////////////////////
 //// Event Handler ////
 let currentAccount;
 
 btnLogin.addEventListener('click', function (e) {
+  // prevent form from submitting
   e.preventDefault();
-
   currentAccount = accounts.find(
     acc => acc.username === inputLoginUsername.value
   );
-  console.log(currentAccount);
+  if (currentAccount?.pin === +inputLoginPin.value) {
+    // display UI and message
+    labelWelcome.textContent = `welcome back, ${
+      currentAccount.owner.split(' ')[0]
+    }`;
+    containerApp.style.opacity = 100;
+    // clear input fields
+    inputLoginUsername.value = inputLoginPin.value = '';
+    inputLoginPin.blur();
+    // display movements
+    displayMovements(currentAccount.movements);
+
+    // display balance
+    calcDisplayBalance(currentAccount);
+
+    // display summary
+    calcDisplaySummary(currentAccount);
+  }
 });
 /////////////////////////////////////////////////
 /////////////////////////////////////////////////
-// LECTURES
-hhbujnkdvch;
-hh;
 
 /////////////////////////////////////////////////
