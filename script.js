@@ -35,6 +35,8 @@ const account4 = {
 
 const accounts = [account1, account2, account3, account4];
 
+//jhfnkmklmkjnvjnv 2022////
+
 // Elements
 const labelWelcome = document.querySelector('.welcome');
 const labelDate = document.querySelector('.date');
@@ -125,7 +127,7 @@ const updateUI = function (acc) {
   // display summary
   calcDisplaySummary(acc);
 };
-
+1;
 ///////////////////////////////////////////////////////////////
 //// Event Handler ////
 let currentAccount;
